@@ -83,7 +83,7 @@ else:
     entry_points = None
 
 setup(
-    name='esptool',
+    name='esptool-ghtest',
     py_modules=['esptool', 'espsecure', 'espefuse'],
     version=find_version('esptool.py'),
     description='A serial utility to communicate & flash code to Espressif ESP8266 & ESP32 chips.',
