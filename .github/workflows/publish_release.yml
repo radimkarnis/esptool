@@ -26,6 +26,15 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist
-        tar -ztvf dist/*
-        twine upload --repository testpypi dist/*
+        PUBLISHED_VERSION=$(curl https://test.pypi.org/pypi/esptool-ghtest/json 2>/dev/null | jq -r '.info.version')
+        CURRENT_VERSION=$(python setup.py --version 2>/dev/null)
+
+        if [ "$PUBLISHED_VERSION" == "$CURRENT_VERSION" ]; then
+          echo "Version ${PUBLISHED_VERSION} already published, skipping..."
+          exit 1
+        else
+          echo "Packaging and publishing new esptool version: ${CURRENT_VERSION}"
+          python setup.py sdist
+          tar -ztvf dist/*
+          twine upload --repository testpypi dist/*
+        fi
