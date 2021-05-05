@@ -1,0 +1,64 @@
+name: Build esptool binaries
+
+on:
+  push:
+    tags:
+      - v*.[0-9]+
+
+jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Version ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build-esptool-binaries:
+    name: Build esptool self-contained binaries for ${{ matrix.os }}
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+        - os: macos-latest
+          TARGET: macos
+        - os: ubuntu-latest
+          TARGET: linux-amd64
+        - os: windows-latest
+          TARGET: win64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+      - name: build with pyinstaller
+        run: |
+          pyinstaller --distpath . -F esptool.py
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.get_release.outputs.upload_url }}
+          asset_path: ./
+          asset_name: esptool*
+          asset_content_type: application/octet-stream
+
