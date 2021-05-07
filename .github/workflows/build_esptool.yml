@@ -58,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ./
+          asset_path: "."
           asset_name: "esptool*"
           asset_content_type: application/octet-stream
 
