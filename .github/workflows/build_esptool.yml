@@ -50,7 +50,7 @@ jobs:
           pip install pyinstaller
       - name: build with pyinstaller
         run: |
-          pyinstaller --distpath ./build -F esptool.py
+          pyinstaller -F esptool.py
           ls
       - name: Upload Release Asset
         id: upload-release-asset
