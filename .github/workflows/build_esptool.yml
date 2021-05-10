@@ -53,7 +53,11 @@ jobs:
           pip install pyinstaller
       - name: build with pyinstaller
         run: |
-          pyinstaller --hidden-import pyserial -F esptool.py
+          pyinstaller -F esptool.py
+          pyinstaller -F espefuse.py
+          pyinstaller -F espsecure.py
+          pyinstaller -F esp_rfc2217_server.py
+          zip -r ${{matrix.TARGET}}.zip ./dist
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -61,7 +65,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: "./dist/${{matrix.BINARY_NAME}}"
-          asset_name: "${{matrix.TARGET}}/${{matrix.BINARY_NAME}}"
-          asset_content_type: application/octet-stream
+          asset_path: "${{matrix.TARGET}}.zip"
+          asset_name: "${{matrix.TARGET}}.zip"
+          #asset_path: "./dist/${{matrix.BINARY_NAME}}"
+          #asset_name: "${{matrix.TARGET}}/${{matrix.BINARY_NAME}}"
+          #asset_content_type: application/octet-stream
+          asset_content_type: application/zip
 
