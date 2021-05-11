@@ -52,22 +52,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install --user -e .
-      - name: build with pyinstaller (${{matrix.os}})
+      - name: build with pyinstaller (${{ matrix.os }})
         if: matrix.os == 'windows-latest'
         run: |
           pyinstaller -F esptool.py
           pyinstaller -F espefuse.py
           pyinstaller -F espsecure.py
           pyinstaller -F esp_rfc2217_server.py
-          7z a ${{matrix.TARGET}}.zip ./dist/*
-        - name: build with pyinstaller (${{matrix.os}})
-          if: matrix.os != 'windows-latest'
-          run: |
+          7z a ${{ matrix.TARGET }}.zip ./dist/*
+      - name: build with pyinstaller (${{ matrix.os }})
+        if: matrix.os != 'windows-latest'
+        run: |
           pyinstaller -F esptool.py
           pyinstaller -F espefuse.py
           pyinstaller -F espsecure.py
           pyinstaller -F esp_rfc2217_server.py
-          zip -r ${{matrix.TARGET}}.zip ./dist
+          zip -r ${{ matrix.TARGET }}.zip ./dist
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -77,10 +77,10 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           #upload_url: ${{ github.event.release.upload_url }}
-          asset_path: "${{matrix.TARGET}}.zip"
-          asset_name: "${{matrix.TARGET}}.zip"
-          #asset_path: "./dist/${{matrix.BINARY_NAME}}"
-          #asset_name: "${{matrix.TARGET}}/${{matrix.BINARY_NAME}}"
+          asset_path: "${{ matrix.TARGET }}.zip"
+          asset_name: "${{ matrix.TARGET }}.zip"
+          #asset_path: "./dist/${{ matrix.BINARY_NAME }}"
+          #asset_name: "${{ matrix.TARGET }}/${{ matrix.BINARY_NAME }}"
           #asset_content_type: application/octet-stream
           asset_content_type: application/zip
 
