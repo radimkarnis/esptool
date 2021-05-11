@@ -52,18 +52,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install --user -e .
-      - name: build with pyinstaller
+      - name: build with pyinstaller (${{matrix.os}})
+        if: matrix.os == 'windows-latest'
         run: |
           pyinstaller -F esptool.py
           pyinstaller -F espefuse.py
           pyinstaller -F espsecure.py
           pyinstaller -F esp_rfc2217_server.py
-          if [[ "${{matrix.os}}" == "windows-latest" ]]
-          then
-            7z a  ${{matrix.TARGET}}.zip ./dist/*
-          else
-            zip -r ${{matrix.TARGET}}.zip ./dist
-          fi
+          7z a  ${{matrix.TARGET}}.zip ./dist/*
+        - name: build with pyinstaller (${{matrix.os}})
+          if: matrix.os != 'windows-latest'
+          run: |
+          pyinstaller -F esptool.py
+          pyinstaller -F espefuse.py
+          pyinstaller -F espsecure.py
+          pyinstaller -F esp_rfc2217_server.py
+          zip -r ${{matrix.TARGET}}.zip ./dist
 
       - name: Upload Release Asset
         id: upload-release-asset
