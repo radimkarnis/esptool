@@ -12,7 +12,7 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: Create Release
+      - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -52,22 +52,24 @@ jobs:
           pip install pyinstaller
           pip install --user -e .
 
-      - name: Build with pyinstaller
+      - name: Build with PyInstaller
         run: |
-          pyinstaller -F --icon=espressif.ico esptool.py
-          pyinstaller -F --icon=espressif.ico espefuse.py
-          pyinstaller -F --icon=espressif.ico espsecure.py
-          pyinstaller -F --icon=espressif.ico esp_rfc2217_server.py
+          pyinstaller -F --icon=.github/espressif.ico esptool.py
+          pyinstaller -F --icon=.github/espressif.ico espefuse.py
+          pyinstaller -F --icon=.github/espressif.ico espsecure.py
+          pyinstaller -F --icon=.github/espressif.ico esp_rfc2217_server.py
 
-      - name: Sign binaries
-        if: matrix.os == 'windows-latest'
-        env:
-          #CERTIFICATE: ${{ secrets.CERTIFICATE }}
-          #CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-          CERTIFICATE: lorem
-          CERTIFICATE_PASSWORD: ipsum
-        shell: pwsh
-        run: ./Sign-File.ps1 -Path target/release/${{matrix.BINARY_NAME}}
+      # - name: Sign binaries
+      #   if: matrix.os == 'windows-latest'
+      #   env:
+      #     CERTIFICATE: ${{ secrets.CERTIFICATE }}
+      #     CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+      #   shell: pwsh
+      #   run: |
+      #     ./.github/Sign-File.ps1 -Path ./dist/esptool.exe
+      #     ./.github/Sign-File.ps1 -Path ./dist/espefuse.exe
+      #     ./.github/Sign-File.ps1 -Path ./dist/espsecure.exe
+      #     ./.github/Sign-File.ps1 -Path ./dist/esp_rfc2217_server.exe
 
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
@@ -76,7 +78,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: 7z a ${{ matrix.TARGET }}.zip ./dist/*
 
-      - name: Upload Release Asset
+      - name: Upload release assets
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
