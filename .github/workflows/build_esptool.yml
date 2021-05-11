@@ -59,7 +59,7 @@ jobs:
           pyinstaller -F espefuse.py
           pyinstaller -F espsecure.py
           pyinstaller -F esp_rfc2217_server.py
-          7z a  ${{matrix.TARGET}}.zip ./dist/*
+          7z a ${{matrix.TARGET}}.zip ./dist/*
         - name: build with pyinstaller (${{matrix.os}})
           if: matrix.os != 'windows-latest'
           run: |
