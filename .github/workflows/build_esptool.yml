@@ -59,10 +59,19 @@ jobs:
           pyinstaller -F --icon=espressif.ico espsecure.py
           pyinstaller -F --icon=espressif.ico esp_rfc2217_server.py
 
+      - name: Sign binaries
+        if: matrix.os == 'windows-latest'
+        env:
+          #CERTIFICATE: ${{ secrets.CERTIFICATE }}
+          #CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          CERTIFICATE: lorem
+          CERTIFICATE_PASSWORD: ipsum
+        shell: pwsh
+        run: ./Sign-File.ps1 -Path target/release/${{matrix.BINARY_NAME}}
+
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
-        run: |
-          zip -r -j ${{ matrix.TARGET }}.zip ./dist/*
+        run: zip -r -j ${{ matrix.TARGET }}.zip ./dist/*
       - name: Package files (7z)
         if: matrix.os == 'windows-latest'
         run: 7z a ${{ matrix.TARGET }}.zip ./dist/*
