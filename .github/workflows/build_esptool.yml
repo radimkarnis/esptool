@@ -24,7 +24,8 @@ jobs:
           prerelease: false
       - name: Get version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
 
   build-esptool-binaries:
     name: Build esptool binaries for ${{ matrix.os }}
@@ -40,6 +41,8 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
+    env:
+      DISTPATH: esptool-${{ needs.create_release.steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -48,13 +51,6 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-
-      - name: Get version
-        id: get_version
-        run:  |
-          echo "DISTPATH=esptool-${GITHUB_REF/refs\/tags\//}-${{ matrix.TARGET }}" >> $GITHUB_ENV
-          echo ${{ env.DISTPATH }}
-        shell: bash
 
       - name: Install dependencies
         run: |
