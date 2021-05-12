@@ -38,7 +38,7 @@ jobs:
         - os: windows-latest
           TARGET: win64
     env:
-      DISTPATH: esptool-${{ github.ref }}-${{ matrix.TARGET }}
+      DISTPATH: esptool-${{ needs.create_release.with.tag_name }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
