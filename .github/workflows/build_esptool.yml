@@ -22,6 +22,9 @@ jobs:
           release_name: Version ${{ github.ref }}
           draft: true
           prerelease: false
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
   build-esptool-binaries:
     name: Build esptool binaries for ${{ matrix.os }}
@@ -37,6 +40,8 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
+    env:
+      DISTPATH: esptool-${{ needs.create_release.steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -52,15 +57,8 @@ jobs:
           pip install pyinstaller
           pip install --user -e .
 
-      - name: Get version
-        id: get_version
-        run: |
-          echo "DISTPATH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "action_state=yellow" >> $GITHUB_ENV
-
       - name: Build with PyInstaller
         run: |
-          echo "${{ env.action_state }}" # This will output 'yellow'
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esptool.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espefuse.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espsecure.py
