@@ -54,10 +54,13 @@ jobs:
 
       - name: Get version
         id: get_version
-        run: echo "DISTPATH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        run: |
+          echo "DISTPATH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "action_state=yellow" >> $GITHUB_ENV
 
       - name: Build with PyInstaller
         run: |
+          echo "${{ env.action_state }}" # This will output 'yellow'
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esptool.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espefuse.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espsecure.py
