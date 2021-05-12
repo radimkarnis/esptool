@@ -1,4 +1,4 @@
-name: Build executable binaries
+name: Build esptool
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   create_release:
-    name: Create release
+    name: Create GitHub release
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -37,8 +37,6 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
-    env:
-      DISTPATH: esptool-${{ needs.create_release.with.tag_name }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -53,6 +51,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install --user -e .
+
+      - name: Get version
+        id: get_version
+        run: echo "DISTPATH=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Build with PyInstaller
         run: |
