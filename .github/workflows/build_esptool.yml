@@ -73,10 +73,10 @@ jobs:
 
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
-        run: zip -r -j ${{ matrix.TARGET }}.zip ./dist/*
+        run: zip -r -j ${{ matrix.TARGET }}.zip ./dist/* LICENSE README.md
       - name: Package files (7z)
         if: matrix.os == 'windows-latest'
-        run: 7z a ${{ matrix.TARGET }}.zip ./dist/*
+        run: 7z a ${{ matrix.TARGET }}.zip ./dist/* LICENSE README.md
 
       - name: Upload release assets
         id: upload-release-asset
