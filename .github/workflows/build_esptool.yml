@@ -78,12 +78,25 @@ jobs:
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
 
-      - name: Package files (zip)
+      - name: Test and package (Linux/MacOS)
         if: matrix.os != 'windows-latest'
-        run: zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/* LICENSE README.md
-      - name: Package files (7z)
+        run: |
+          ./esptool -h
+          ./espefuse -h
+          ./espsecure -h
+          ./esp_rfc2217_server -h
+          mv LICENSE README.md ./${{ env.DISTPATH }}
+          zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/*
+      - name: Test and package (Windows)
         if: matrix.os == 'windows-latest'
-        run: 7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }} LICENSE README.md
+        shell: bash
+        run: |
+          ./esptool.exe -h
+          ./espefuse.exe -h
+          ./espsecure.exe -h
+          ./esp_rfc2217_server.exe -h
+          mv LICENSE README.md ./${{ env.DISTPATH }}
+          7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}
 
       - name: Upload release assets
         id: upload-release-asset
