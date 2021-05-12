@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      VERSION: ${{ steps.get_version.outputs.VERSION }}
     steps:
       - name: Create release
         id: create_release
@@ -42,7 +43,7 @@ jobs:
         - os: windows-latest
           TARGET: win64
     env:
-      DISTPATH: esptool-${{ needs.create_release.steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
+      DISTPATH: esptool-${{ needs.create_release.outputs.VERSION }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
