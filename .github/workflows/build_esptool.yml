@@ -37,6 +37,8 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
+    env:
+      DISTPATH: esptool-${{ github.ref }}-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -54,10 +56,10 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico esptool.py
-          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico espefuse.py
-          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico espsecure.py
-          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico esp_rfc2217_server.py
+          pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esptool.py
+          pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espefuse.py
+          pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espsecure.py
+          pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esp_rfc2217_server.py
 
       # - name: Sign binaries
       #   if: matrix.os == 'windows-latest'
@@ -66,17 +68,17 @@ jobs:
       #     CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
       #   shell: pwsh
       #   run: |
-      #     ./.github/Sign-File.ps1 -Path ./dist/esptool.exe
-      #     ./.github/Sign-File.ps1 -Path ./dist/espefuse.exe
-      #     ./.github/Sign-File.ps1 -Path ./dist/espsecure.exe
-      #     ./.github/Sign-File.ps1 -Path ./dist/esp_rfc2217_server.exe
+      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esptool.exe
+      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espefuse.exe
+      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
+      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
 
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
-        run: zip -r esptool-${{ github.ref }}-${{ matrix.TARGET }}.zip ./esptool-${{ github.ref }}-${{ matrix.TARGET }}/* LICENSE README.md
+        run: zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/* LICENSE README.md
       - name: Package files (7z)
         if: matrix.os == 'windows-latest'
-        run: 7z a esptool-${{ github.ref }}-${{ matrix.TARGET }}.zip ./esptool-${{ github.ref }}-${{ matrix.TARGET }} LICENSE README.md
+        run: 7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }} LICENSE README.md
 
       - name: Upload release assets
         id: upload-release-asset
@@ -85,7 +87,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: "${{ matrix.TARGET }}.zip"
-          asset_name: "${{ matrix.TARGET }}.zip"
+          asset_path: "${{ env.DISTPATH }}.zip"
+          asset_name: "${{ env.DISTPATH }}.zip"
           asset_content_type: application/zip
 
