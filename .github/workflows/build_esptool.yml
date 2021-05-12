@@ -51,7 +51,9 @@ jobs:
 
       - name: Get version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run:  |
+          echo "DISTPATH=esptool-${GITHUB_REF/refs\/tags\//}-${{ matrix.TARGET }}" >> $GITHUB_ENV
+          echo ${{ env.DISTPATH }}
         shell: bash
 
       - name: Install dependencies
@@ -61,8 +63,6 @@ jobs:
           pip install --user -e .
 
       - name: Build with PyInstaller
-        env:
-          DISTPATH: esptool-${{ steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
         run: |
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esptool.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espefuse.py
@@ -83,13 +83,9 @@ jobs:
 
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
-        env:
-          DISTPATH: esptool-${{ steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
         run: zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/* LICENSE README.md
       - name: Package files (7z)
         if: matrix.os == 'windows-latest'
-        env:
-          DISTPATH: esptool-${{ steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
         run: 7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }} LICENSE README.md
 
       - name: Upload release assets
@@ -97,7 +93,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISTPATH: esptool-${{ steps.get_version.outputs.VERSION }}-${{ matrix.TARGET }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: "${{ env.DISTPATH }}.zip"
