@@ -6,7 +6,7 @@ esptool.py was started by Fredrik Ahlberg (@[themadinventor](https://github.com/
 
 esptool.py is Free Software under a GPLv2 license.
 
-[![Test esptool](https://github.com/espressif/esptool/workflows/Test%20esptool/badge.svg?branch=master)](https://github.com/espressif/esptool)
+[![Test esptool](https://github.com/espressif/esptool/workflows/Test%20esptool/badge.svg?branch=master)](https://github.com/espressif/esptool) [![Build esptool](https://github.com/radimkarnis/esptool/actions/workflows/build_esptool.yml/badge.svg)](https://github.com/radimkarnis/esptool/actions/workflows/build_esptool.yml)
 
 ## Installation / dependencies
 
@@ -451,8 +451,8 @@ Running `esptool.py --trace` will dump all serial interactions to the standard o
 
 esptool.py, espefuse.py, and espsecure.py can easily be integrated into Python applications or called from other Python scripts.
 
-While it currently does have a poor Python API, something which [#208](https://github.com/espressif/esptool/issues/208) will address, it allows for passing CLI 
-arguments to `esptool.main()`. This workaround makes integration very straightforward as you can pass exactly the 
+While it currently does have a poor Python API, something which [#208](https://github.com/espressif/esptool/issues/208) will address, it allows for passing CLI
+arguments to `esptool.main()`. This workaround makes integration very straightforward as you can pass exactly the
 same arguments as you would on the CLI.
 
 ```python
