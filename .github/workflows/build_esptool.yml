@@ -54,10 +54,10 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller -F --icon=.github/espressif.ico esptool.py
-          pyinstaller -F --icon=.github/espressif.ico espefuse.py
-          pyinstaller -F --icon=.github/espressif.ico espsecure.py
-          pyinstaller -F --icon=.github/espressif.ico esp_rfc2217_server.py
+          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico esptool.py
+          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico espefuse.py
+          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico espsecure.py
+          pyinstaller --distpath ./esptool-${{ github.ref }}-${{ matrix.TARGET }} -F --icon=.github/espressif.ico esp_rfc2217_server.py
 
       # - name: Sign binaries
       #   if: matrix.os == 'windows-latest'
@@ -73,10 +73,10 @@ jobs:
 
       - name: Package files (zip)
         if: matrix.os != 'windows-latest'
-        run: zip -r -j ${{ matrix.TARGET }}.zip ./dist/* LICENSE README.md
+        run: zip -r esptool-${{ github.ref }}-${{ matrix.TARGET }}.zip ./esptool-${{ github.ref }}-${{ matrix.TARGET }}/* LICENSE README.md
       - name: Package files (7z)
         if: matrix.os == 'windows-latest'
-        run: 7z a ${{ matrix.TARGET }}.zip ./dist/* LICENSE README.md
+        run: 7z a esptool-${{ github.ref }}-${{ matrix.TARGET }}.zip ./esptool-${{ github.ref }}-${{ matrix.TARGET }} LICENSE README.md
 
       - name: Upload release assets
         id: upload-release-asset
