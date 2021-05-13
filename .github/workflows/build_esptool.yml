@@ -5,7 +5,6 @@ on: [push, pull_request]
 jobs:
   build-esptool-binaries:
     name: Build esptool binaries for ${{ matrix.os }}
-    # needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,6 +16,7 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
+          EXTEN: .exe
     env:
       DISTPATH: esptool-${{ matrix.TARGET }}
     steps:
@@ -53,28 +53,16 @@ jobs:
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
 
-      - name: Test and package (Linux/MacOS)
-        if: matrix.os != 'windows-latest'
-        run: |
-          ./${{ env.DISTPATH }}/esptool -h
-          ./${{ env.DISTPATH }}/espefuse -h
-          ./${{ env.DISTPATH }}/espsecure -h
-          ./${{ env.DISTPATH }}/esp_rfc2217_server -h
-          mv LICENSE README.md ./${{ env.DISTPATH }}
-          zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/*
-      - name: Test and package (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Test binaries
         shell: bash
         run: |
-          ./${{ env.DISTPATH }}/esptool.exe -h
-          ./${{ env.DISTPATH }}/espefuse.exe -h
-          ./${{ env.DISTPATH }}/espsecure.exe -h
-          ./${{ env.DISTPATH }}/esp_rfc2217_server.exe -h
-          mv LICENSE README.md ./${{ env.DISTPATH }}
-          7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}
+          ./${{ env.DISTPATH }}/esptool${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/espefuse${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/espsecure${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/esp_rfc2217_server${{ matrix.EXTEN }} -h
 
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DISTPATH }}
-          path: ${{ env.DISTPATH }}.zip
+          path: ${{ env.DISTPATH }}
