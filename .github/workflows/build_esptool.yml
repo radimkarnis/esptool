@@ -41,18 +41,6 @@ jobs:
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espsecure.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esp_rfc2217_server.py
 
-      # - name: Sign binaries
-      #   if: matrix.os == 'windows-latest'
-      #   env:
-      #     CERTIFICATE: ${{ secrets.CERTIFICATE }}
-      #     CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-      #   shell: pwsh
-      #   run: |
-      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esptool.exe
-      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espefuse.exe
-      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
-      #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
-
       - name: Test binaries
         shell: bash
         run: |

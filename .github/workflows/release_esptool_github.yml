@@ -1,4 +1,4 @@
-name: Esptool GitHub release
+name: GitHub release
 
 on:
   push:
