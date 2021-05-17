@@ -61,6 +61,7 @@ jobs:
           name: ${{ env.DISTPATH }}
           path: ${{ env.DISTPATH }}
       - name: Add license and readme
+        shell: bash
         run: mv LICENSE README.md ./${{ env.DISTPATH }}
 
   create_release:
