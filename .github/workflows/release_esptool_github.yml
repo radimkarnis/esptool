@@ -55,14 +55,14 @@ jobs:
           ./${{ env.DISTPATH }}/espefuse${{ matrix.EXTEN }} -h
           ./${{ env.DISTPATH }}/espsecure${{ matrix.EXTEN }} -h
           ./${{ env.DISTPATH }}/esp_rfc2217_server${{ matrix.EXTEN }} -h
+      - name: Add license and readme
+        shell: bash
+        run: mv LICENSE README.md ./${{ env.DISTPATH }}
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DISTPATH }}
           path: ${{ env.DISTPATH }}
-      - name: Add license and readme
-        shell: bash
-        run: mv LICENSE README.md ./${{ env.DISTPATH }}
 
   create_release:
     name: Create GitHub release
