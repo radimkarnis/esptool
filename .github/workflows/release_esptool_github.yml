@@ -1,15 +1,10 @@
 name: GitHub release
 
 on: [push, pull_request]
-# on:
-#   push:
-#     tags:
-#       - v*.*
 
 jobs:
   build-esptool-binaries:
     name: Build esptool binaries for ${{ matrix.os }}
-    #needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -27,25 +22,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
-
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install --user -e .
-
       - name: Build with PyInstaller
         run: |
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esptool.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espefuse.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico espsecure.py
           pyinstaller --distpath ./${{ env.DISTPATH }} -F --icon=.github/espressif.ico esp_rfc2217_server.py
-
       # - name: Sign binaries
       #   if: matrix.os == 'windows-latest'
       #   env:
@@ -57,7 +48,6 @@ jobs:
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espefuse.exe
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
-
       - name: Test binaries
         shell: bash
         run: |
@@ -65,28 +55,13 @@ jobs:
           ./${{ env.DISTPATH }}/espefuse${{ matrix.EXTEN }} -h
           ./${{ env.DISTPATH }}/espsecure${{ matrix.EXTEN }} -h
           ./${{ env.DISTPATH }}/esp_rfc2217_server${{ matrix.EXTEN }} -h
-
       - name: Archive artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DISTPATH }}
           path: ${{ env.DISTPATH }}
-
-
-
-      #     mv LICENSE README.md ./${{ env.DISTPATH }}
-      #     zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/*
-      # - name: Test and package (Windows)
-      #   if: matrix.os == 'windows-latest'
-      #   shell: bash
-      #   run: |
-      #     ./${{ env.DISTPATH }}/esptool.exe -h
-      #     ./${{ env.DISTPATH }}/espefuse.exe -h
-      #     ./${{ env.DISTPATH }}/espsecure.exe -h
-      #     ./${{ env.DISTPATH }}/esp_rfc2217_server.exe -h
-      #     mv LICENSE README.md ./${{ env.DISTPATH }}
-      #     7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}
-
+      - name: Add license and readme
+        run: mv LICENSE README.md ./${{ env.DISTPATH }}
 
   create_release:
     name: Create GitHub release
@@ -121,7 +96,7 @@ jobs:
       matrix:
         TARGET: [macos, linux-amd64, win64]
     env:
-      DISTPATH: esptool-${{ needs.create_release_outputs.VERSION }}-${{ matrix.TARGET }}
+      DISTPATH: esptool-${{ needs.create_release.outputs.VERSION }}-${{ matrix.TARGET }}
     steps:
       - name: Download built binaries
         uses: actions/download-artifact@v2
@@ -139,4 +114,3 @@ jobs:
           asset_path: "${{ env.DISTPATH }}.zip"
           asset_name: "${{ env.DISTPATH }}.zip"
           asset_content_type: application/zip
-
