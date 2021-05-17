@@ -1,36 +1,15 @@
 name: GitHub release
 
-on:
-  push:
-    tags:
-      - v*.*
+on: [push, pull_request]
+# on:
+#   push:
+#     tags:
+#       - v*.*
 
 jobs:
-  create_release:
-    name: Create GitHub release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      VERSION: ${{ steps.get_version.outputs.VERSION }}
-    steps:
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Version ${{ github.ref }}
-          draft: true
-          prerelease: false
-      - name: Get version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-        shell: bash
-
   build-esptool-binaries:
     name: Build esptool binaries for ${{ matrix.os }}
-    needs: create_release
+    #needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -42,8 +21,9 @@ jobs:
           TARGET: linux-amd64
         - os: windows-latest
           TARGET: win64
+          EXTEN: .exe
     env:
-      DISTPATH: esptool-${{ needs.create_release.outputs.VERSION }}-${{ matrix.TARGET }}
+      DISTPATH: esptool-${{ matrix.TARGET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -78,25 +58,59 @@ jobs:
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/espsecure.exe
       #     ./.github/Sign-File.ps1 -Path ./${{ env.DISTPATH }}/esp_rfc2217_server.exe
 
-      - name: Test and package (Linux/MacOS)
-        if: matrix.os != 'windows-latest'
-        run: |
-          ./${{ env.DISTPATH }}/esptool -h
-          ./${{ env.DISTPATH }}/espefuse -h
-          ./${{ env.DISTPATH }}/espsecure -h
-          ./${{ env.DISTPATH }}/esp_rfc2217_server -h
-          mv LICENSE README.md ./${{ env.DISTPATH }}
-          zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/*
-      - name: Test and package (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Test binaries
         shell: bash
         run: |
-          ./${{ env.DISTPATH }}/esptool.exe -h
-          ./${{ env.DISTPATH }}/espefuse.exe -h
-          ./${{ env.DISTPATH }}/espsecure.exe -h
-          ./${{ env.DISTPATH }}/esp_rfc2217_server.exe -h
-          mv LICENSE README.md ./${{ env.DISTPATH }}
-          7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}
+          ./${{ env.DISTPATH }}/esptool${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/espefuse${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/espsecure${{ matrix.EXTEN }} -h
+          ./${{ env.DISTPATH }}/esp_rfc2217_server${{ matrix.EXTEN }} -h
+
+      - name: Archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DISTPATH }}
+          path: ${{ env.DISTPATH }}
+
+
+
+      #     mv LICENSE README.md ./${{ env.DISTPATH }}
+      #     zip -r ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}/*
+      # - name: Test and package (Windows)
+      #   if: matrix.os == 'windows-latest'
+      #   shell: bash
+      #   run: |
+      #     ./${{ env.DISTPATH }}/esptool.exe -h
+      #     ./${{ env.DISTPATH }}/espefuse.exe -h
+      #     ./${{ env.DISTPATH }}/espsecure.exe -h
+      #     ./${{ env.DISTPATH }}/esp_rfc2217_server.exe -h
+      #     mv LICENSE README.md ./${{ env.DISTPATH }}
+      #     7z a ${{ env.DISTPATH }}.zip ./${{ env.DISTPATH }}
+
+
+  create_release:
+    name: Create GitHub release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      VERSION: ${{ steps.get_version.outputs.VERSION }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Version ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
+
 
       - name: Upload release assets
         id: upload-release-asset
