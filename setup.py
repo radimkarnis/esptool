@@ -73,7 +73,7 @@ Please see the `contributions guide \
 """
 
 setup(
-    name="esptool",
+    name="esptool-ghtest",
     version=find_version("esptool/__init__.py"),
     description="A serial utility to communicate & flash code to Espressif chips.",
     long_description=long_description,

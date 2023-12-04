@@ -36,5 +36,5 @@ jobs:
           echo "Packaging and publishing new esptool version: ${CURRENT_VERSION}"
           python setup.py sdist
           tar -ztvf dist/*
-          twine upload dist/*
+          twine upload --repository testpypi dist/*
         fi

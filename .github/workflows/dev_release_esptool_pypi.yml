@@ -39,4 +39,4 @@ jobs:
         echo "Packaging and publishing new esptool development release: ${{ github.ref_name }}"
         python setup.py sdist
         tar -ztvf dist/*
-        twine upload dist/*
+        twine upload --repository testpypi dist/*
