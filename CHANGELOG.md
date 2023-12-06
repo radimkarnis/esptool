@@ -1,3 +1,9 @@
+## v4.7.1 (2023-12-06)
+
+### Bug Fixes
+
+- **commitizen**: Test fix
+
 ## v4.7.0 (2023-12-05)
 
 ### Feat
