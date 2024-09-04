@@ -1,3 +1,9 @@
+## v4.8.1 (2024-09-04)
+
+### Bug Fixes
+
+- **esptool**: Upload to test pypi with build
+
 ## v4.8.0 (2024-09-04)
 
 ### New Features
