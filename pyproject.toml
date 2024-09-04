@@ -3,7 +3,7 @@
     build-backend = "setuptools.build_meta"
 
 [project]
-    name = "esptool"
+    name = "esptool-ghtest"
     authors = [
         {name = "Fredrik Ahlberg (themadinventor)"},
         {name = "Angus Gratton (projectgus)"},
