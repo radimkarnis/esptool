@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test_esptool:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # 22.04 is the last version with Python 3.7
 
     strategy:
       matrix:
@@ -68,10 +68,10 @@ jobs:
         - name: Checkout
           uses: actions/checkout@master
 
-        - name: Set up Python 3.7
+        - name: Set up Python 3.13
           uses: actions/setup-python@master
           with:
-            python-version: 3.7
+            python-version: 3.13
 
         - name: Run pre-commit hooks
           run: |
